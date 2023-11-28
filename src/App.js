@@ -1,10 +1,13 @@
 import React from 'react';
+import Homescreen from './Homescreen';
+import Nav from './Nav';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <h1>Netflix</h1>
+      <Nav />
+      <Homescreen />
     </div>
   );
 }
