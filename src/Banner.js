@@ -24,20 +24,22 @@ export default function Banner() {
         return str?.length > n ? str.substring(0, n - 1) + '...' : str;
     }
 
+    console.log(movie);
+
     return (
         <header className='banner' style={{
-            backgroundImage: `url('https://w0.peakpx.com/wallpaper/342/521/HD-wallpaper-youtube-channel-art-black-black-banner.jpg')`,
+            backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.8) 0, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.8) 100%), url('https://image.tmdb.org/t/p/original${movie?.backdrop_path}')`,
             backgroundSize: "cover",
             backgroundPosition: "center center"
         }}>
             <div className='banner__contents'>
-                <h1 className='banner__title'>Movie name</h1>
+                <h1 className='banner__title'>{movie?.title || movie?.name || movie?.original_name}</h1>
                 <div className='banner__buttons'>
                     <button className='banner__button'>Play</button>
                     <button className='banner__button'>My List</button>
                 </div>
                 <h1 className='banner__description'>
-                    {truncate('Test description', 150)}
+                    {truncate(movie?.overview, 150)}
                 </h1>
             </div>
             <div className='banner__fadeBottom' />
