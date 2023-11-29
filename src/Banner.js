@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Banner.css';
+import instance from './axios';
+import requests from './Requests';
 
 export default function Banner() {
+    const [movie, setMovie] = useState([]);
+
+    useEffect(() => {
+        async function fetchData() {
+            const req = await instance.get(requests.fetchNetflixOriginals);
+            setMovie(
+                req.data.results[
+                Math.floor(Math.random() * req.data.results.length - 1)
+                ]
+            );
+            return req;
+        }
+
+        fetchData();
+    }, []);
 
     function truncate(str, n) {
         return str?.length > n ? str.substring(0, n - 1) + '...' : str;
