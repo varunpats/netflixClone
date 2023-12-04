@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Homescreen from './screens/Homescreen';
 import Loginscreen from './screens/Loginscreen';
+import Profilescreen from './screens/Profilescreen';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { auth } from './firebase';
 import './App.css';
@@ -19,12 +20,12 @@ function App() {
           email: userAuth.email,
         }));
       } else {
-        dispatch(logout);
+        dispatch(logout());
       }
     });
 
     return subscirption;
-  }, [])
+  }, [dispatch])
 
   return (
     <div className="app">
@@ -37,6 +38,9 @@ function App() {
               <Route
                 path="/"
                 element={<Homescreen />} />
+              <Route
+                path="/profile"
+                element={<Profilescreen />} />
             </Routes>)
         }
       </Router>
