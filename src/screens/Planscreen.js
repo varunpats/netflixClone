@@ -3,13 +3,27 @@ import './Planscreen.css';
 import db from '../firebase';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../features/userSlice';
-import { loadStripe } from '@stripe/stripe-js';
-import postscribe from 'postscribe';
 
 export default function Planscreen() {
-    // postscribe('.planscreen_plan', '<script src="https://js.stripe.com/v3/"></script>');
     const [products, setProducts] = useState([]);
+    const [subscription, setSubscription] = useState(null);
     const user = useSelector(selectUser);
+
+    useEffect(() => {
+        db.collection("customers")
+            .doc(user.uid)
+            .collection("subscriptions")
+            .get()
+            .then(querySnapshot => {
+                querySnapshot.forEach(async subscription => {
+                    setSubscription({
+                        role: subscription.data().role,
+                        current_period_end: subscription.data().current_period_end.seconds,
+                        current_period_start: subscription.data().current_period_start.seconds,
+                    })
+                })
+            })
+    }, [user.uid])
 
     useEffect(() => {
         db.collection("products")
@@ -32,6 +46,9 @@ export default function Planscreen() {
     }, [])
 
     const loadCheckout = async (priceId) => {
+        if (subscription)
+            return
+
         const docRef = await db.collection("customers")
             .doc(user.uid).collection("checkout_sessions")
             .add({
@@ -47,25 +64,29 @@ export default function Planscreen() {
                 alert(`An error occured: ${error.message}`)
             }
 
-            console.log(docRef.price);
-
-            // if (sessionId) {
-            //     const stripe = loadStripe('pk_test_51OKxKhSE833rR16LEoIhaOAx2kC5iLUghQekgExXPffJnDZyIjA74SNzWhwf9zw0Kw9eQ4aNRMb4sSkk57mBF0B200WRVgqyE7')
-            //     stripe.redirectToCheckout({ sessionId })
-            // }
+            if (sessionId) {
+                const stripe = window.Stripe('pk_test_51OKxKhSE833rR16LEoIhaOAx2kC5iLUghQekgExXPffJnDZyIjA74SNzWhwf9zw0Kw9eQ4aNRMb4sSkk57mBF0B200WRVgqyE7')
+                stripe.redirectToCheckout({ sessionId })
+            }
         })
     }
 
     return (
-        <div className='planscreen'>
+        <div className='planscreen'><br />
+            {subscription && <p>Renewal date: {new Date(subscription?.current_period_end * 1000).toLocaleDateString()}</p>}
+
             {Object.entries(products).map(([productId, productData]) => {
+                const currentPlan = productData.name.includes(subscription.role.slice(1));
+
                 return (
-                    <div className='planscreen_plan'>
+                    <div key={productId} className={`${currentPlan && "planscreen_disabled"} planscreen_plan`}>
                         <div className='planscreen_info'>
                             <h5>{productData.name}</h5>
                             <h6>{productData.description}</h6>
                         </div>
-                        <button onClick={() => loadCheckout(productData.prices.priceId)}>Subscribe</button>
+                        <button onClick={() => !currentPlan && loadCheckout(productData.prices.priceId)}>
+                            {currentPlan ? "Active Plan" : "Subscribe"}
+                        </button>
                     </div>
                 )
             })}

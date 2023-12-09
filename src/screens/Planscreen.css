@@ -18,3 +18,7 @@
     border: none;
     cursor: pointer;
 }
+
+.planscreen_disabled > button {
+    background-color: gray !important;
+}
