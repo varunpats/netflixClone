@@ -76,7 +76,7 @@ export default function Planscreen() {
             {subscription && <p>Renewal date: {new Date(subscription?.current_period_end * 1000).toLocaleDateString()}</p>}
 
             {Object.entries(products).map(([productId, productData]) => {
-                const currentPlan = productData.name.includes(subscription.role.slice(1));
+                const currentPlan = productData.name.includes(subscription?.role.slice(1));
 
                 return (
                     <div key={productId} className={`${currentPlan && "planscreen_disabled"} planscreen_plan`}>
